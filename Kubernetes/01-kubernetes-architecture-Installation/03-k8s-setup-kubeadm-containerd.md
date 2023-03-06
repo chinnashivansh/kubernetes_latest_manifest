@@ -40,6 +40,7 @@ sysctl --system
 
 ## Install containerd package on all nodes
 - Set up the repository 
+- 
 sudo apt-get update
 sudo apt-get install \
     ca-certificates \
