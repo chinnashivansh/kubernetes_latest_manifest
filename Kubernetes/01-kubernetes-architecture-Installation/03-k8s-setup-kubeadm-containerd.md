@@ -16,9 +16,10 @@
 
 - Please execute below commands on all nodes used for kubernetes cluster.
 ```
-containerd:
+**containerd:
+**Enabling Kernel settings and IP tables for CNI (Container network interface) for Pod to Pod Communication.
 
-cat > /etc/modules-load.d/containerd.conf <<EOF
+cat > /etc/modules-load.d/containerd.conf <<EOF**
 overlay
 br_netfilter
 EOF
