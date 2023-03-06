@@ -16,8 +16,8 @@
 
 - Please execute below commands on all nodes used for kubernetes cluster.
 ```
-**containerd:
-**Enabling Kernel settings and IP tables for CNI (Container network interface) for Pod to Pod Communication.
+# Containerd
+# Enabling Kernel settings and IP tables for CNI (Container network interface) for Pod to Pod Communication.
 
 cat > /etc/modules-load.d/containerd.conf <<EOF**
 overlay
@@ -39,27 +39,35 @@ sysctl --system
 ```
 
 ## Install containerd package on all nodes
-- Set up the repository
-- Install packages to allow apt to use a repository over HTTPS
-```
-apt-get update && apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-
+- Set up the repository 
+sudo apt-get update
+sudo apt-get install \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
 ## Add Docker’s official GPG key
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+sudo mkdir -m 0755 -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
 ## Add Docker apt repository.
-add-apt-repository \
-    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-    $(lsb_release -cs) \
-    stable"
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 ## Install containerd
-apt-get update && apt-get install -y containerd.io
+apt-get update 
+apt-get install -y containerd.io
 
 # Configure containerd
 mkdir -p /etc/containerd
 containerd config default > /etc/containerd/config.toml
-sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
+
+# Configuring the systemd CGroup Driver
+* We need to configure the CGroup in etc/containerd/config.toml  ---File
+* CGroup--Control groups is used to control the systems Resources like CPU nad Memory for container and it will make sure Container run time and Kubelet Both are using same CGroup driver i.e systemd.  so we need to make SystemdCgroup = true
+
+CMD----sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
 
 # Restart containerd
 systemctl restart containerd
